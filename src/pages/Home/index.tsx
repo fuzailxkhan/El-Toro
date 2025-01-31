@@ -6,6 +6,8 @@ import GovernanceTab from './governance-tab'
 import { Grid } from '@mui/material'
 import { FormContainerStyled } from '@components/FormContainer/styles'
 import StatsTab from './stats-tab'
+import Analytics from './analytics'
+
 
 const Home = () => {
   const [tab, setTab] = React.useState(0)
@@ -18,6 +20,7 @@ const Home = () => {
     if (tab === 0) return <StakingTab />
     else if (tab === 1) return <h1>Hello</h1>
     else if (tab === 2) return <StatsTab />
+    else if (tab===3) return <Analytics />
   }
 
   return (
@@ -38,9 +41,10 @@ const Home = () => {
             { name: 'Staking' },
             { name: 'Swap' }, // Disabled tab
             { name: 'Statistics' },
+            { name: 'Analytics' }
           ]}
           xsValue={10}
-          mdValue={3.5}
+          mdValue={5}
         />
       </Grid>
       {renderTab()}
