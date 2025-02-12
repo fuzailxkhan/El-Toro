@@ -5,6 +5,7 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Transaction } from './transactions/entities/transactions.entities';
+import { MarketModule } from './market/market.module';
 
 
 @Module({
@@ -25,7 +26,9 @@ import { Transaction } from './transactions/entities/transactions.entities';
         entities: [Transaction], // Add entities here
         synchronize: true, // Auto-create tables (disable in production)
       }),
-    }),TransactionsModule],
+    }),
+    TransactionsModule,
+     MarketModule],
   controllers: [AppController],
   providers: [AppService],
 })
