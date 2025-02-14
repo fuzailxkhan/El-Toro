@@ -85,7 +85,7 @@ const StatsTab = () => {
           color={'#F6F6F6'}
           sx={{ opacity: '0.7' }}
         >
-          ABC token ecosystem statistics  
+          Toro token ecosystem statistics  
         </Typography>
       </Grid>
 
@@ -100,7 +100,7 @@ const StatsTab = () => {
           <Grid container marginBottom={'12px'}>
             <img src={VanarToken} height={'24px'} />
             <Typography fontSize={'16px'} color={'#F6F6F6'} marginLeft={0.5}>
-              Total ABC supply
+              Total Toro supply
             </Typography>
           </Grid>
           <Grid>
@@ -118,7 +118,7 @@ const StatsTab = () => {
           <Grid container marginBottom={'12px'}>
             <img src={VanarToken} height={'24px'} />
             <Typography fontSize={'16px'} color={'#F6F6F6'} marginLeft={0.5}>
-              ABC in circulation
+              Toro in circulation
             </Typography>
           </Grid>
           <Grid>
@@ -136,7 +136,7 @@ const StatsTab = () => {
           <Grid container marginBottom={'12px'}>
             <img src={VanarToken} height={'24px'} />
             <Typography fontSize={'16px'} color={'#F6F6F6'} marginLeft={0.5}>
-              ABC Price
+              Toro Price
             </Typography>
           </Grid>
           <Grid container justifyContent={'flex-start'} alignItems={'baseline'}>
@@ -173,7 +173,7 @@ const StatsTab = () => {
           <Grid container marginBottom={'12px'}>
             {<img src={VanarToken} height={'24px'} />}
             <Typography fontSize={'16px'} color={'#F6F6F6'} marginLeft={0.5}>
-              ABC marketcap 
+              Toro marketcap 
             </Typography>
           </Grid>
           <Grid>
@@ -211,7 +211,7 @@ const StatsTab = () => {
           >
             <img src={VanarToken} height={'24px'} />
             <Typography fontSize={'16px'} color={'#F6F6F6'} marginLeft={0.5}>
-              Total ABC Staked
+              Total Toro Staked
             </Typography>
           </Grid>
 

@@ -216,7 +216,7 @@ const StakingTab = () => {
         mt={'50px'}
       >
         <Typography fontSize={'40px'} fontWeight={'600'} color={'#F6F6F6'}>
-          Stake VANRY
+          Stake Toro
         </Typography>
         <Typography
           fontSize={'16px'}

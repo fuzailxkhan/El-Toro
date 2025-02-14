@@ -342,7 +342,7 @@ const Reward = () => {
           <Grid display={'flex'} alignItems={'center'}>
             <img src={VanarToken} height={'18px'} />
             <Typography color={'#FFFFFF'} fontSize={'16px'} marginLeft={'2px'}>
-              ABC
+              Toro
             </Typography>
           </Grid>
         </Grid>

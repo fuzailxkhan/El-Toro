@@ -18,9 +18,9 @@ const Home = () => {
 
   const renderTab = () => {
     if (tab === 0) return <StakingTab />
-    else if (tab === 1) return <h1>Hello</h1>
-    else if (tab === 2) return <StatsTab />
-    else if (tab===3) return <Analytics />
+    // else if (tab === 1) return <h1>Hello</h1>
+    else if (tab === 1) return <StatsTab />
+    else if (tab===2) return <Analytics />
   }
 
   return (
@@ -39,7 +39,7 @@ const Home = () => {
           handleChange={handleTabChange}
           tabNames={[
             { name: 'Staking' },
-            { name: 'Swap' }, // Disabled tab
+            // { name: 'Swap' }, // Disabled tab
             { name: 'Statistics' },
             { name: 'Analytics' }
           ]}
