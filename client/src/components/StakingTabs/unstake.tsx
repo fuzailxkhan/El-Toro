@@ -34,6 +34,7 @@ import { simulateContract, http, createConfig } from '@wagmi/core'
 import { bscTestnet } from 'viem/chains'
 import { config } from './configuration'
 import ProgressBar from '@components/ProgressBar'
+import { farmingAbi, farmingContractAddress } from './contract'
 
 // import { StakingDatabaseAddress, stakingDatabaseAbi, stakingManagerAbi, stakingManagerAddress } from '../../constants/contracts'
 
@@ -64,6 +65,14 @@ const Unstake = () => {
     StakingDatabaseAddress = '',
     stakingDatabaseAbi = '',
   } = contractsAndAbis ?? {}
+
+  /* @ts-ignore */
+  const { refetch: refetchStakedAmount, data: stakedAmount } = useReadContract({
+    abi: farmingAbi,
+    address: farmingContractAddress,
+    functionName: 'stakedAmounts',
+    args: [address?.toLowerCase() as `0x${string}`],
+  })
 
   /* @ts-ignore */
   const res: any = useReadContract({
@@ -169,6 +178,7 @@ const Unstake = () => {
     }
     if (isTxSuccess) {
       refetch()
+      refetchStakedAmount();
       dispatch(setTxInProgress(false))
       dispatch(
         setSnackbar({
@@ -226,6 +236,21 @@ const Unstake = () => {
   // })
 
   console.log('values', { isError, data, isPending, isSuccess })
+
+  const onWithDraw = () => {
+    console.log('withdraw amount', withdrawAmount)
+    const amount: any = ethers.utils.parseEther(withdrawAmount)
+
+    /* @ts-ignore */
+    const contractRes = writeContract({
+      abi: farmingAbi,
+      address: farmingContractAddress,
+      functionName: 'unstake',
+      args: [amount],
+      gas: BigInt(74000),
+      })
+      console.log('contract res', contractRes); 
+  }
 
   const onStake = useCallback(async () => {
     try {
@@ -305,8 +330,8 @@ const Unstake = () => {
             width: '100%',
             marginTop: '50px',
           }}
-          onClick={onStake}
-          disabled={true}
+          onClick={onWithDraw}
+          // disabled={true}
           // disabled={disableButton}
         >
           Withdraw
@@ -357,7 +382,9 @@ const Unstake = () => {
             fontSize={'16px'}
             sx={{ opacity: '0.5' }}
           >
-            Balance:{BigNumber(balance).toFixed(4)}
+            {/* Balance:{BigNumber(balance).toFixed(4)} */}
+            {stakedAmount && ethers.utils.formatEther(stakedAmount.toString())}
+        
           </Typography>
 
           <Grid display={'flex'} alignItems={'center'}>
@@ -383,7 +410,7 @@ const Unstake = () => {
        Unstake Time: {timeToUnstake}
       </Typography>}
 
-      <Typography
+      {/* <Typography
         color={'#F6F6F6'}
         fontSize={'16px'}
         fontWeight={'500'}
@@ -392,7 +419,7 @@ const Unstake = () => {
       >
         X% fee is applied when you claim rewards. If you claim before your
         locked in period is over, you will pay an additional X fee.
-      </Typography>
+      </Typography> */}
 
       <RenderButton />
 

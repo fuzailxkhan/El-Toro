@@ -66,20 +66,20 @@ const Router = () => {
   const txInProgress = useAppSelector(state => state.wallet.txInProgress)
 
   // new chain configuration
-  useEffect(() => {
-    if (chainIdWagmi) {
-      if (
-        chainIdWagmi !== SupportedChainId.VANAR_TESTNET &&
-        chainIdWagmi !== SupportedChainId.GOERLI &&
-        chainIdWagmi !== SupportedChainId.HARDHAT_NETWORK &&
-        chainIdWagmi !== SupportedChainId.SEPOLIA &&
-        chainIdWagmi !== SupportedChainId.BSC &&
-        chainIdWagmi !== SupportedChainId.MAINNET
-      ) {
-        setShowNetworkError(true)
-      } else setShowNetworkError(false)
-    }
-  }, [chainIdWagmi])
+  // useEffect(() => {
+  //   if (chainIdWagmi) {
+  //     if (
+  //       chainIdWagmi !== SupportedChainId.VANAR_TESTNET &&
+  //       chainIdWagmi !== SupportedChainId.GOERLI &&
+  //       chainIdWagmi !== SupportedChainId.HARDHAT_NETWORK &&
+  //       chainIdWagmi !== SupportedChainId.SEPOLIA &&
+  //       chainIdWagmi !== SupportedChainId.BSC &&
+  //       chainIdWagmi !== SupportedChainId.MAINNET
+  //     ) {
+  //       setShowNetworkError(true)
+  //     } else setShowNetworkError(false)
+  //   }
+  // }, [chainIdWagmi])
 
   // useEffect(() => {
   //   console.log(chainId, 'chainId')
@@ -97,34 +97,34 @@ const Router = () => {
   //   }
   // }, [chainId])
 
-  if (showNetworkError) {
-    return (
-      <WrongNetworkErrorContainer>
-        <div>Unsupported Network, please switch to Vanar Testnet</div>{' '}
-        <GoldButton
-          style={{ marginTop: 10 }}
-          onClick={
-            () =>
-              switchChain({ chainId: 78600  })
-              // chainChangeRequest('0x5C6463', () => console.log('changed'))
-              // chainChangeRequest(
-              //   `0x${Number(SupportedChainId.VANAR_TESTNET)
-              //     .toString(16)
-              //     .toUpperCase()}`,
-              //   () => console.log('changed'),
-              // )
-            // addChainToMetamask(chainConfig['0x6648E5'], () => {
-            //   console.log('changed')
-            // })
-          }
-        >
-          <Typography color="#000" variant="h6">
-            Switch Network
-          </Typography>
-        </GoldButton>
-      </WrongNetworkErrorContainer>
-    )
-  }
+  // if (showNetworkError) {
+  //   return (
+  //     <WrongNetworkErrorContainer>
+  //       <div>Unsupported Network, please switch to Holesky Testnet</div>{' '}
+  //       <GoldButton
+  //         style={{ marginTop: 10 }}
+  //         onClick={
+  //           () =>
+  //             switchChain({ chainId: 78600  })
+  //             // chainChangeRequest('0x5C6463', () => console.log('changed'))
+  //             // chainChangeRequest(
+  //             //   `0x${Number(SupportedChainId.VANAR_TESTNET)
+  //             //     .toString(16)
+  //             //     .toUpperCase()}`,
+  //             //   () => console.log('changed'),
+  //             // )
+  //           // addChainToMetamask(chainConfig['0x6648E5'], () => {
+  //           //   console.log('changed')
+  //           // })
+  //         }
+  //       >
+  //         <Typography color="#000" variant="h6">
+  //           Switch Network
+  //         </Typography>
+  //       </GoldButton>
+  //     </WrongNetworkErrorContainer>
+  //   )
+  // }
 
   return (
     <BrowserRouter>

@@ -40,6 +40,8 @@ import { Address, createPublicClient } from 'viem'
 import { http, createConfig, prepareTransactionRequest } from '@wagmi/core'
 import { arbitrum, mainnet, bscTestnet } from 'wagmi/chains'
 import { config } from './configuration'
+import { farmingAbi, farmingContractAddress } from './contract'
+
 // import { stakingManagerAbi, stakingManagerAddress } from '../../constants/contracts'
 
 // import { useBalance } from 'wagmi';
@@ -119,59 +121,59 @@ const Stake = () => {
     })()
   }, [isTxSuccess])
 
-  const onStake = useCallback(async () => {
-    // console.clear()
-    if (depositAmount > balance) {
-      console.log('here check in the iff')
-      dispatch(
-        setSnackbar({
-          message: 'Insufficient Balance',
-          open: true,
-          severity: 'error',
-        }),
-      )
+  // const onStake = useCallback(async () => {
+  //   // console.clear()
+  //   if (depositAmount > balance) {
+  //     console.log('here check in the iff')
+  //     dispatch(
+  //       setSnackbar({
+  //         message: 'Insufficient Balance',
+  //         open: true,
+  //         severity: 'error',
+  //       }),
+  //     )
 
-      return
-    }
+  //     return
+  //   }
 
-    dispatch(setTxInProgress(true))
+  //   dispatch(setTxInProgress(true))
 
-    // try {
+  //   // try {
 
-    try {
-      console.log('on stake chala', depositAmount)
-      const amount: any = ethers.utils.parseEther(depositAmount)
-      console.log('amount', amount)
+  //   try {
+  //     console.log('on stake chala', depositAmount)
+  //     const amount: any = ethers.utils.parseEther(depositAmount)
+  //     console.log('amount', amount)
 
-      console.log('params', { address, amount, activeLockupOption })
+  //     console.log('params', { address, amount, activeLockupOption })
 
-      if (address && stakingManagerAbi && stakingManagerAddress) {
-        /* @ts-ignore */
-        const contractRes = await writeContractAsync({
-          value: amount,
-          abi: stakingManagerAbi,
-          address: stakingManagerAddress,
-          functionName: 'stake',
-          args: [address, activeLockupOption],
-          // gas: BigInt(74000),
-        })
-        console.log('contractRes', contractRes)
-      }
-    } catch (err) {
-      // alert('tx failed in catch!')
-      dispatch(
-        setSnackbar({
-          message: 'Transaction failed',
-          open: true,
-          severity: 'error',
-        }),
-      )
-      dispatch(setTxInProgress(false))
-      console.log('catch', err)
-    } finally {
-      // setDepositAmount('')
-    }
-  }, [depositAmount])
+  //     if (address && stakingManagerAbi && stakingManagerAddress) {
+  //       /* @ts-ignore */
+  //       const contractRes = await writeContractAsync({
+  //         value: amount,
+  //         abi: stakingManagerAbi,
+  //         address: stakingManagerAddress,
+  //         functionName: 'stake',
+  //         args: [address, activeLockupOption],
+  //         // gas: BigInt(74000),
+  //       })
+  //       console.log('contractRes', contractRes)
+  //     }
+  //   } catch (err) {
+  //     // alert('tx failed in catch!')
+  //     dispatch(
+  //       setSnackbar({
+  //         message: 'Transaction failed',
+  //         open: true,
+  //         severity: 'error',
+  //       }),
+  //     )
+  //     dispatch(setTxInProgress(false))
+  //     console.log('catch', err)
+  //   } finally {
+  //     // setDepositAmount('')
+  //   }
+  // }, [depositAmount])
 
   const setAmountWRTPercent = async (percent: number) => {
     // console.clear()
@@ -216,6 +218,34 @@ const Stake = () => {
     // }
   }
 
+  const onStake = async () => {
+    console.log('hello')
+    try {
+      const amount: any = ethers.utils.parseEther(depositAmount)
+      /* @ts-ignore */
+              const contractRes = writeContract({
+              abi: farmingAbi,
+              address: farmingContractAddress,
+              functionName: 'stake',
+              args: [amount],
+              gas: BigInt(74000),
+            })
+    
+            console.log('contractRes', contractRes);
+    } catch(err) {
+      alert('Tx failed')
+      console.log('isError', isError)
+
+    }
+    finally {
+
+      console.log('data', data);
+    }
+
+
+  }
+
+
   const RenderButton = () => {
     if (!address)
       return (
@@ -236,7 +266,7 @@ const Stake = () => {
           }}
           onClick={onStake}
           // disabled={!depositAmount}
-          disabled={true}
+          // disabled={true}
         >
           Stake
         </Button>

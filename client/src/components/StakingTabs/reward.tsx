@@ -26,6 +26,7 @@ import { getBalance as getBalanceWagmi, createConfig, http } from '@wagmi/core'
 import { bscTestnet } from 'viem/chains'
 import { config } from './configuration'
 import ProgressBar from '@components/ProgressBar'
+import { farmingAbi, farmingContractAddress } from './contract'
 
 const Reward = () => {
   const [depositAmt, setDepositAmt] = useState('')
@@ -282,6 +283,19 @@ const Reward = () => {
     })()
   }, [isTxSuccess])
 
+  const onRewardClaim = () => {
+    
+    /* @ts-ignore */
+const contractRes = writeContract({
+  abi: farmingAbi,
+  address: farmingContractAddress,
+  functionName: 'claimReward',
+  gas: BigInt(74000),
+})
+console.log('contract res', contractRes);
+}
+
+
   const onStake = useCallback(async () => {
     try {
       if (address) {
@@ -320,9 +334,10 @@ const Reward = () => {
             width: '100%',
             marginTop: '50px',
           }}
-          onClick={onStake}
+          onClick={onRewardClaim}
+          // onClick={onStake}
           // disabled={disableClaimButton}
-          disabled={true}
+          // disabled={true}
         >
           Claim
         </Button>
@@ -360,14 +375,14 @@ const Reward = () => {
           />
         </Grid> */}
 
-        <Grid display={'flex'} justifyContent={'space-between'} width={'100%'}>
-          <Typography
+        {/* <Grid display={'flex'} justifyContent={'space-between'} width={'100%'}> */}
+          {/* <Typography
             color={'#F6F6F6'}
             fontSize={'16px'}
             sx={{ opacity: '0.5' }}
           >
             Balance:{BigNumber(balance).toFixed(8)}
-          </Typography>
+          </Typography> */}
 
           {/* <Grid display={'flex'} alignItems={'center'}>
             <Chip
@@ -377,7 +392,7 @@ const Reward = () => {
               onClick={() => setAmountWRTPercent(100)}
             />
           </Grid> */}
-        </Grid>
+        {/* </Grid> */}
       </InputContainer>
 
         {console.log('check reward', timeToUnstake)}
@@ -394,7 +409,7 @@ const Reward = () => {
         </Typography>
       )}
 
-      <Typography
+      {/* <Typography
         color={'#F6F6F6'}
         fontSize={'16px'}
         fontWeight={'500'}
@@ -403,7 +418,7 @@ const Reward = () => {
       >
         X% fee is applied when you claim rewards. If you claim before your
         locked in period is over, you will pay an additional X fee.
-      </Typography>
+      </Typography> */}
 
       <RenderButton />
       {/* <Button
