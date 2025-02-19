@@ -375,7 +375,7 @@ const Unstake = () => {
             }}
           />
         </Grid>
-
+    
         <Grid display={'flex'} justifyContent={'space-between'} width={'100%'}>
           <Typography
             color={'#F6F6F6'}

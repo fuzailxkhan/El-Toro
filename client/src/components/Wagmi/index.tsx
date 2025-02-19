@@ -3,7 +3,7 @@ import { createWeb3Modal } from '@web3modal/wagmi/react'
 import { defaultWagmiConfig  } from '@web3modal/wagmi/react/config';
 import { defineChain } from 'viem'
 import { WagmiProvider } from 'wagmi'
-import { arbitrum, mainnet, bscTestnet, holesky } from 'wagmi/chains'
+import { arbitrum, mainnet, bscTestnet, holesky, sepolia } from 'wagmi/chains'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Router from '@components/Router';
 
@@ -79,7 +79,7 @@ const vanarChain = {
 // };
 // }
 
-const chains = [holesky] as const
+const chains = [holesky, sepolia] as const
 
 // const chains = [vanarChain, mainnet, arbitrum, bscTestnet] as const
 const config = defaultWagmiConfig({

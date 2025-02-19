@@ -19,7 +19,7 @@ import { getConnectionName } from './connection'
 
 console.log('started')
 
-console.log = console.error = console.warn = () => {}
+// console.log = console.error = console.warn = () => {}
 
 const App = () => {
   const connections = useOrderedConnections()
