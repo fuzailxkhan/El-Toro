@@ -23,10 +23,13 @@ console.log('started')
 
 const App = () => {
   const connections = useOrderedConnections()
+  
   const connectors: any = connections.map(({ hooks, connector }: any) => [
     connector,
     hooks,
   ])
+
+ 
   const key = useMemo(
     () => connections.map(({ type }: any) => getConnectionName(type)).join('-'),
     [connections],

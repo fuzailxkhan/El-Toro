@@ -224,7 +224,7 @@ const StakingTab = () => {
           color={'#F6F6F6'}
           sx={{ opacity: '0.7' }}
         >
-          Select how much VANRY you want to stake  
+          Select how much TORO you want to stake  
         </Typography>
       </Grid>
 

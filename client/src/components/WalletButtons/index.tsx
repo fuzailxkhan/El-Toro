@@ -165,7 +165,8 @@ const WalletButtons: FC<Props> = props => {
       <ButtonsContainer fullWidth={props.fullWidth ? true : false}>
         {!address ? (
           <ConnectWalletButton
-            onClick={() => {
+            onClick={(event) => {
+              event.preventDefault();
               console.log('click')
               open()
             }}

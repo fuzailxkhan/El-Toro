@@ -5,42 +5,42 @@ import { Redis } from 'ioredis';
 import axios from 'axios';
 
 export interface CryptoInterface {
-  id: string;
-  name: string;
-  image: string;
-  current_price: number;
-  market_cap: number;
-  total_volume: number;
-  price_change_percentage_24h: number;
+  id: string; // Symbol (e.g., BTCUSDT)
+  name: string; // Base asset name (e.g., BTC)
+  current_price: number; // Last price
+  market_cap: number; // Calculated market cap
+  total_volume: number; // Volume in base asset
+  price_change_percentage_24h: number; // Calculated 24h change
 }
 
 @Injectable()
 export class MarketService {
   private readonly logger = new Logger(MarketService.name);
-  private readonly coingeckoBaseUrl = 'https://api.coingecko.com/api/v3';
-  private readonly CACHE_KEY = 'crypto-rates';
-  private readonly CACHE_TTL = 300; // 5 minutes in seconds
+  private readonly binanceApiUrl =
+    'https://www.binance.com/bapi/asset/v2/public/asset-service/product/get-products?includeEtf=true';
+  private readonly CACHE_KEY = 'crypto-market-data';
+  private readonly CACHE_TTL = 1; // 1 minute in seconds
 
   constructor(@InjectRedis() private readonly redis: Redis) {}
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_SECOND)
   async fetchCryptoRates(): Promise<void> {
     try {
       const cryptoData = await this.getCryptoData();
-      console.log(cryptoData[0].name+'   ====>  '+cryptoData[0].current_price  )
       if (cryptoData.length > 0) {
         // Save data to Redis
-        await this.redis.setex(
+        await this.redis.set(
           this.CACHE_KEY,
-          this.CACHE_TTL,
           JSON.stringify(cryptoData),
+          'EX',
+          this.CACHE_TTL,
         );
-        this.logger.log('Crypto rates updated successfully in Redis.');
+        this.logger.log('Crypto market data updated successfully in Redis.');
       } else {
-        this.logger.warn('No data received from CoinGecko API.');
+        this.logger.warn('No data processed from Binance API.');
       }
     } catch (error) {
-      this.logger.error(`Error fetching crypto rates: ${error.message}`);
+      this.logger.error(`Error fetching crypto market data: ${error.message}`);
     }
   }
 
@@ -54,10 +54,10 @@ export class MarketService {
       return JSON.parse(data) as CryptoInterface[];
     } catch (error) {
       this.logger.error(
-        `Error retrieving crypto rates from Redis: ${error.message}`,
+        `Error retrieving crypto market data from Redis: ${error.message}`,
       );
       throw new HttpException(
-        'Failed to retrieve crypto rates',
+        'Failed to retrieve crypto market data',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -65,37 +65,48 @@ export class MarketService {
 
   async getCryptoData(): Promise<CryptoInterface[]> {
     try {
-      const response = await axios.get(`${this.coingeckoBaseUrl}/coins/markets`, {
-        headers: {
-          'x-cg-demo-api-key': 'CG-ZtUcUjv9LWbACKwGorKfc7jj', // Replace with your valid API key if necessary
-        },
-        params: {
-          vs_currency: 'usd',
-          order: 'market_cap_desc',
-          per_page: 10,
-          page: 1,
-          sparkline: false,
-        },
-      });
+      const response = await axios.get(this.binanceApiUrl);
 
-      if (response.data && Array.isArray(response.data)) {
-        return response.data.map((coin: any) => ({
-          id: coin.id,
-          name: coin.name,
-          image: coin.image,
-          current_price: coin.current_price,
-          market_cap: coin.market_cap,
-          total_volume: coin.total_volume,
-          price_change_percentage_24h: coin.price_change_percentage_24h,
-        }));
+      if (response.data && Array.isArray(response.data.data)) {
+        const tokensOfInterest = [
+          'BTC',
+          'ETH',
+          'XRP',
+          'USDT',
+          'SOL',
+          'BNB',
+          'USDC',
+          'DOGE',
+          'ADA',
+          'TRX',
+        ];
+
+        // Filter for tokens with USDT pair and calculate fields
+        const processedData = response.data.data
+          .filter((token: any) => tokensOfInterest.includes(token.b) && token.q === 'USDT')
+          .map((token: any) => ({
+            id: token.s, // Symbol (e.g., BTCUSDT)
+            name: token.b, // Base asset name (e.g., BTC)
+            current_price: parseFloat(token.c), // Last price
+            market_cap: token.cs
+              ? parseFloat(token.o) * parseFloat(token.cs) // Open price * Circulating supply
+              : 0,
+            total_volume: parseFloat(token.v), // Volume in base asset
+            price_change_percentage_24h:
+              ((parseFloat(token.c) - parseFloat(token.o)) /
+                parseFloat(token.o)) *
+              100, // (Current - Open) / Open * 100
+          }));
+
+        return processedData;
       } else {
-        this.logger.warn('Unexpected response data format from CoinGecko API.');
+        this.logger.warn('Unexpected response data format from Binance API.');
         return [];
       }
     } catch (error) {
       this.logger.error(`Failed to fetch crypto data: ${error.message}`);
       throw new HttpException(
-        'Failed to fetch crypto data from CoinGecko',
+        'Failed to fetch crypto data from Binance',
         HttpStatus.BAD_GATEWAY,
       );
     }

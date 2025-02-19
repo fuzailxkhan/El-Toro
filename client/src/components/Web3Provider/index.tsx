@@ -13,6 +13,7 @@ const Web3Provider: FC<Props> = () => {
   const connectors: [Connector, Web3ReactHooks][] = connections.map(
     ({ hooks, connector }) => [connector, hooks],
   )
+  
 
   const key = useMemo(
     () =>

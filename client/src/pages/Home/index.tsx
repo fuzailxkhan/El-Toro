@@ -7,6 +7,7 @@ import { Grid } from '@mui/material'
 import { FormContainerStyled } from '@components/FormContainer/styles'
 import StatsTab from './stats-tab'
 import Analytics from './analytics'
+import SwapTab from './swap-tab'
 
 
 const Home = () => {
@@ -18,9 +19,9 @@ const Home = () => {
 
   const renderTab = () => {
     if (tab === 0) return <StakingTab />
-    // else if (tab === 1) return <h1>Hello</h1>
-    else if (tab === 1) return <StatsTab />
-    else if (tab===2) return <Analytics />
+    else if (tab === 1) return <SwapTab/>
+    else if (tab === 2) return <StatsTab />
+    else if (tab===3) return <Analytics />
   }
 
   return (
@@ -39,7 +40,7 @@ const Home = () => {
           handleChange={handleTabChange}
           tabNames={[
             { name: 'Staking' },
-            // { name: 'Swap' }, // Disabled tab
+            { name: 'Swap' }, 
             { name: 'Statistics' },
             { name: 'Analytics' }
           ]}
