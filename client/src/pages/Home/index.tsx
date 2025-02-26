@@ -31,6 +31,7 @@ const Home = () => {
       justifyContent={'center'}
       alignItems={'center'}
       columnGap={2}
+      marginBottom={'32px'}
     >
 
       <Grid container justifyContent={'center'}>
