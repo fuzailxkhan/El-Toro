@@ -1,28 +1,29 @@
 import { Button, Chip, FormControl, Grid, Input, InputLabel, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { InputContainer, StakingContainer } from './styles'
-import TabsComponent from './tabs'
-import { validateAndFormatInput } from '@utils/*'
-import { BigNumber, ethers } from 'ethers'
+// import TabsComponent from './tabs'
+import { validateAndFormatInput } from '../../../src/utils/index'
+import {  ethers } from 'ethers'
 import WalletButtons from '@components/WalletButtons'
 import { useAccount, useWriteContract, useWalletClient, useChainId } from 'wagmi'
 import {ConnectionType} from '../../connection/index'
-import {VanarToken} from '../../assets/index'
+// import {VanarToken} from '../../assets/index'
 import { farmAbi } from '@components/StakingTabs/farmContract'
-import { erc20Abi, getContract } from 'viem'
+import { erc20Abi } from 'viem'
 import { useSwitchChain } from 'wagmi'
 import SwapVerticalCircleIcon from '@mui/icons-material/SwapVerticalCircle';
+import { CryptoInterface } from './analytics'
 const SwapTab = () => {
 
   const swapableCurrencyList = [
     {
-      name: 'WETH',
-      symbol: 'WETH',
+      name: 'ETH',
+      symbol: 'ETH',
       address: '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14'
     },
     {
-      name:'USDC', 
-      symbol:'USDC',
+      name:'USDT', 
+      symbol:'USDT',
       address:'0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
     },
     {
@@ -35,8 +36,56 @@ const SwapTab = () => {
   const { address, isConnecting, isDisconnected, isConnected } = useAccount()
   const [swapCurrency, setSwapCurrency] = useState('');
   const [forCurrency, setForCurrency] = useState('');
+  const [swapAmount, setSwapAmount] = useState('');
+  const [forAmount, setForAmount] = useState('');
+  const [cryptoData , setCryptoData] = useState<CryptoInterface[]>();
+  const [forRate,setForRate] = useState('');
+  const [swapRate,setSwapRate] = useState('');
 
-  const [toCurrency, setToCurrency] = useState('Toro')
+  useEffect(() => {
+    const eventSource = new EventSource('http://localhost:3000/market/stream');
+    eventSource.onmessage = (event) => {
+      try {
+        const data: CryptoInterface[] = JSON.parse(event.data);
+        setCryptoData(data);
+      } catch (err) {
+        console.error('Error parsing SSE data:', err);
+      }
+    };
+
+    eventSource.onerror = () => {
+      console.error('SSE connection error');
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
+
+  // Calculate rates and update `forAmount`
+  useEffect(() => {
+    console.log("SC =>",swapCurrency,"FC =>",forCurrency,"SA =>",swapAmount)
+    if (!swapCurrency || !forCurrency || !swapAmount || !cryptoData?.length) return;
+
+    // Find swap and for currency rates
+    const swapData = cryptoData?.find((item) => item?.name === swapCurrency);
+    const forData = cryptoData?.find((item) => item?.name === forCurrency);
+    console.log("Setting Swap Rate =>", swapRate  )
+    console.log("Setting For Rate =>", forRate)
+    if (swapData && forData) {
+      setSwapRate(swapData.current_price.toString());
+      console.log("Setting Swap Rate =>", swapRate  )
+      setForRate(forData.current_price.toString());
+      console.log("Setting For Rate =>", forRate)
+
+      const calculatedForAmount = (parseFloat(swapAmount) * swapData.current_price) / forData.current_price;
+      setForAmount(calculatedForAmount.toFixed(6)); // Limiting to 6 decimal places
+      console.log("Setting For Amount =>", forAmount)
+    }
+  }, [swapCurrency, forCurrency, swapAmount, cryptoData]);
+
+
   const {
     writeContract,
     data,
@@ -48,9 +97,7 @@ const SwapTab = () => {
   const { data: walletClient } = useWalletClient();
   const { chains, switchChain } = useSwitchChain()
   const chainId = useChainId()
-  console.log('chain id', chainId)
   
-  console.log('walletClient', walletClient)
 
   useEffect(() => {
     if(chainId !== 11155111) {
@@ -118,7 +165,7 @@ async function getSigner() {
 
   
     // in the parse ether field, we need to pass the amount of the token we want to swap
-    const amountIn = ethers.utils.parseEther('0.001');
+    const amountIn = ethers.utils.parseEther(swapAmount);
     const amountOutMin = 1;
 
     // @ts-ignore //
@@ -201,11 +248,11 @@ async function getSigner() {
         <Grid container alignItems={'center'} sx={{ flexWrap: 'nowrap'}}>
           <Input
             placeholder="0"
-            // value={depositAmount}
-            // onChange={e => {
-            //   const formattedValue = validateAndFormatInput(e.target.value)
-            //   setDepositAmount(formattedValue)
-            // }}
+            value={swapAmount}
+            onChange={e => {
+              const formattedValue = validateAndFormatInput(e.target.value)
+              setSwapAmount(formattedValue)
+            }}
             onKeyDown={e => {
               if (e.key === 'e' || e.key === '-' || e.key === '+') {
                 e.preventDefault()
@@ -216,6 +263,7 @@ async function getSigner() {
             sx={{
               width: '100%'
             }}
+            
           />
           <FormControl variant="standard" sx={{ minWidth: '80px', color: 'white', fontSize: '12px', marginTop:0 }}>
             {!swapCurrency && (
@@ -311,7 +359,7 @@ async function getSigner() {
         <Grid container alignItems={'center'} sx={{ flexWrap: 'nowrap' }}>
           <Input
             placeholder="0"
-            // value={depositAmount}
+            value={forAmount}
             // onChange={e => {
             //   const formattedValue = validateAndFormatInput(e.target.value)
             //   setDepositAmount(formattedValue)
@@ -323,8 +371,13 @@ async function getSigner() {
             }}
             disableUnderline
             type="number"
+            disabled
             sx={{
               width: '100%',
+              color: 'gray',
+              '& .MuiInputBase-input.Mui-disabled': {
+                  WebkitTextFillColor: '#175b4d', // Ensures color override
+                },
             }}
           />
           <FormControl variant="standard" sx={{ minWidth: '80px', color: 'white', fontSize: '12px' }}>
@@ -399,11 +452,17 @@ async function getSigner() {
       
         </Grid>
       </InputContainer>
-
+    
+      {(swapCurrency&&forCurrency)&&
+      <Typography margin={"auto"} fontSize={"12px"}>
+        {swapRate} {swapCurrency} = {forRate} {forCurrency}
+      </Typography>}
       <RenderButton />
+      
     </Grid>
       
     </StakingContainer>
+    
   </Grid>
   )
 }

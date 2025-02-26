@@ -79,6 +79,7 @@ export class MarketService {
           'DOGE',
           'ADA',
           'TRX',
+          'UNI'
         ];
 
         // Filter for tokens with USDT pair and calculate fields

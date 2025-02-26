@@ -3,7 +3,7 @@ import "./analytics.css";
 import CryptoTable from "@components/CryptoTable/CryptoTable";
 import { Grid, Typography } from "@mui/material";
 
-interface Crypto {
+export interface CryptoInterface {
   id: string;
   name: string;
   image: string;
@@ -14,7 +14,7 @@ interface Crypto {
 }
 
 const Analytics = () => {
-  const [cryptoData, setCryptoData] = useState<Crypto[]>([]);
+  const [cryptoData, setCryptoData] = useState<CryptoInterface[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,7 +24,7 @@ const Analytics = () => {
     eventSource.onmessage = (event) => {
       console.log("Received SSE data:", event.data);
       try {
-        const data: Crypto[] = JSON.parse(event.data); // Parse the data from SSE
+        const data: CryptoInterface[] = JSON.parse(event.data); // Parse the data from SSE
         setCryptoData(data); // Update the state with the transformed data
         setLoading(false);
       } catch (err) {
