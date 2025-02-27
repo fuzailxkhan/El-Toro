@@ -13,8 +13,9 @@ import { erc20Abi } from 'viem'
 import { useSwitchChain } from 'wagmi'
 import SwapVerticalCircleIcon from '@mui/icons-material/SwapVerticalCircle';
 import { CryptoInterface } from './analytics'
-const SwapTab = () => {
 
+
+const SwapTab = () => {
   const swapableCurrencyList = [
     {
       name: 'ETH',
@@ -22,163 +23,300 @@ const SwapTab = () => {
       address: '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14'
     },
     {
-      name:'USDT', 
-      symbol:'USDT',
-      address:'0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
+      name: 'USDT',
+      symbol: 'USDT',
+      address: '0xdAC17F958D2ee523a2206206994597C13D831ec7'
     },
     {
-      name: "UNI",
-      symbol: "UNI",
-      address: "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"
+      name: 'UNI',
+      symbol: 'UNI',
+      address: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984'
     }
-  ]
+  ];
 
-  const { address, isConnecting, isDisconnected, isConnected } = useAccount()
+  
+  
+  const { writeContract } = useWriteContract();
+  const { chains, switchChain } = useSwitchChain();
+  const chainId = useChainId();
+  
+  const { address, isConnected } = useAccount();
   const [swapCurrency, setSwapCurrency] = useState('');
   const [forCurrency, setForCurrency] = useState('');
   const [swapAmount, setSwapAmount] = useState('');
-  const [forAmount, setForAmount] = useState('');
-  const [cryptoData , setCryptoData] = useState<CryptoInterface[]>();
-  const [forRate,setForRate] = useState('');
-  const [swapRate,setSwapRate] = useState('');
+  const [cryptoData, setCryptoData] = useState<{ [key: string]: number }>({});
+  
+  // Computed rates
+  const [conversionRate, setConversionRate] = useState('');
+  const [swapToUsdtRate, setSwapToUsdtRate] = useState('');
+  const [forToUsdtRate, setForToUsdtRate] = useState('');
 
+  const [swapBalance, setSwapBalance] = useState('0');
+  const [forBalance, setForBalance] = useState('0');
+  
+  // Fetch real-time crypto data
   useEffect(() => {
     const eventSource = new EventSource('http://localhost:3000/market/stream');
+  
     eventSource.onmessage = (event) => {
       try {
-        const data: CryptoInterface[] = JSON.parse(event.data);
-        setCryptoData(data);
+        const data = JSON.parse(event.data);
+        const priceMap = data.reduce((acc: any, curr: any) => {
+          acc[curr.name] = curr.current_price;
+          return acc;
+        }, {});
+        setCryptoData(priceMap);
       } catch (err) {
         console.error('Error parsing SSE data:', err);
       }
     };
-
+  
     eventSource.onerror = () => {
       console.error('SSE connection error');
       eventSource.close();
     };
-
+  
     return () => {
       eventSource.close();
     };
   }, []);
+  
+  // Compute rates dynamically
+useEffect(() => {
+  if (!swapCurrency ) return;
 
-  // Calculate rates and update `forAmount`
-  useEffect(() => {
-    console.log("SC =>",swapCurrency,"FC =>",forCurrency,"SA =>",swapAmount)
-    if (!swapCurrency || !forCurrency || !swapAmount || !cryptoData?.length) return;
+  // 1 swapCurrency = ? forCurrency
+  const swapPriceInUsdt = cryptoData[swapCurrency]; // Price in USDT
+  const forPriceInUsdt = cryptoData[forCurrency]; // Price in USDT
 
-    // Find swap and for currency rates
-    const swapData = cryptoData?.find((item) => item?.name === swapCurrency);
-    const forData = cryptoData?.find((item) => item?.name === forCurrency);
-    console.log("Setting Swap Rate =>", swapRate  )
-    console.log("Setting For Rate =>", forRate)
-    if (swapData && forData) {
-      setSwapRate(swapData.current_price.toString());
-      console.log("Setting Swap Rate =>", swapRate  )
-      setForRate(forData.current_price.toString());
-      console.log("Setting For Rate =>", forRate)
+  if(swapCurrency=='USDT'){
+    setConversionRate((1 / forPriceInUsdt)?.toFixed(6));
+  }else if(forCurrency=='USDT'){
+    setConversionRate((swapPriceInUsdt / 1)?.toFixed(6));
+  }else{
+  setConversionRate((swapPriceInUsdt / forPriceInUsdt)?.toFixed(6));}
 
-      const calculatedForAmount = (parseFloat(swapAmount) * swapData.current_price) / forData.current_price;
-      setForAmount(calculatedForAmount.toFixed(6)); // Limiting to 6 decimal places
-      console.log("Setting For Amount =>", forAmount)
-    }
-  }, [swapCurrency, forCurrency, swapAmount, cryptoData]);
+  // 1 swapCurrency = ? USDT
+  if(swapCurrency!='USDT')
+  {
+    setSwapToUsdtRate(swapPriceInUsdt?.toFixed(6));}
+  else{
+    setSwapToUsdtRate('1');
+  }
 
-
-  const {
-    writeContract,
-    data,
-    isError,
-    writeContractAsync,
-    isPending,
-    isSuccess,
-  } = useWriteContract()
-  const { data: walletClient } = useWalletClient();
-  const { chains, switchChain } = useSwitchChain()
-  const chainId = useChainId()
+  // 1 forCurrency = ? USDT
+  if(forCurrency!='USDT'){
+    
+    setForToUsdtRate(forPriceInUsdt?.toFixed(6));
+  }else{
+    setForToUsdtRate('1')
+  }
   
 
-  useEffect(() => {
-    if(chainId !== 11155111) {
-      switchChain({ chainId: 11155111 })
+}, [swapCurrency , cryptoData]);
+
+useEffect(()=>{
+  if (!swapCurrency ) return;
+
+  
+  // 1 swapCurrency = ? forCurrency
+  const swapPriceInUsdt = cryptoData[swapCurrency]; // Price in USDT
+  const forPriceInUsdt = cryptoData[forCurrency]; // Price in USDT
+
+
+  if(swapCurrency=='USDT'){
+    setConversionRate((1 / forPriceInUsdt)?.toFixed(6));
+  }else if(forCurrency=='USDT'){
+    setConversionRate((swapPriceInUsdt / 1)?.toFixed(6));
+  }else{
+  setConversionRate((swapPriceInUsdt / forPriceInUsdt)?.toFixed(6));}
+
+  if(swapCurrency!='USDT')
+    {
+      setSwapToUsdtRate(swapPriceInUsdt?.toFixed(6));}
+    else{
+      setSwapToUsdtRate('1');
     }
-  }, [chainId])
+  
+    // 1 forCurrency = ? USDT
+    if(forCurrency!='USDT'){
+      
+      setForToUsdtRate(forPriceInUsdt?.toFixed(6));
+    }else{
+      setForToUsdtRate('1')
+    }
+},[forCurrency , cryptoData])
+
+useEffect(() => {
+  if (!address || !swapCurrency) return;
 
 
-  const handleSwapCurrnecyChange = (event:SelectChangeEvent) => {
-    setSwapCurrency(event.target.value as string)
+  if(window.ethereum){
+    const provider = new ethers.providers.Web3Provider(window.ethereum); // ✅ Define inside effect
+
+
+    if (swapCurrency === 'ETH') {
+      // Get native token balance
+      provider.getBalance(address).then(balance => {
+        setSwapBalance(ethers.utils.formatEther(balance));
+      });
+    } else {
+      // Find the token from swapableCurrencyList
+        const token = swapableCurrencyList.find((token) => token.symbol === swapCurrency);
+        
+        if (token) {
+          getTokenBalance(token.address).then((balance) => {
+            setSwapBalance(balance || "0");
+          });
+        } else {
+          console.error("Token not found:", swapCurrency);
+          setSwapBalance("0");
+        }
+    }
   }
+}, [swapCurrency, address]);
 
-  const handleForCurrnecyChange = (event:SelectChangeEvent) => {
-    setForCurrency(event.target.value as string)
+useEffect(() => {
+  if (!address || !forCurrency) return;
+
+  if(window.ethereum){
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    // ✅ Define inside effect
+
+
+    if (forCurrency === 'ETH') {
+      provider.getBalance(address).then(balance => {
+        setForBalance(ethers.utils.formatEther(balance));
+      });
+    } else {
+
+        const token = swapableCurrencyList.find((token) => token.symbol === swapCurrency);
+          
+        if (token) {
+        getTokenBalance(token.address).then(balance => {
+          setForBalance(balance || '0');
+        });}else{
+          console.error("Token not Found",forCurrency);
+          setForBalance('0')
+        }
+    }
   }
+}, [forCurrency, address]);
 
+  
+  useEffect(() => {
+    if (chainId !== 11155111) {
+      switchChain({ chainId: 11155111 });
+    }
+  }, [chainId]);
+
+  const getTokenBalance = async (tokenAddress: string) => {
+    if (!address || !window.ethereum) return;
+
+        
+
+  
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(tokenAddress, erc20Abi, signer);
+  
+      const balance = await contract.balanceOf(address);
+      return ethers.utils.formatUnits(balance, 18); // Assuming 18 decimal places
+    } catch (error) {
+      console.error("Error fetching token balance:", error);
+    }
+  };
+
+  const getNativeBalance = async () => {
+    if (!address) return;
+    if(window.ethereum){
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const balance = await provider.getBalance(address);
+    console.log("ETH Balance:", ethers.utils.formatEther(balance));
+    }else{
+      return
+    }
+    
+  };
+  
+  const handleSwapCurrencyChange = (event: SelectChangeEvent) => {
+    const value = event.target.value as string;
+    if (value === forCurrency) return; // Prevent selecting the same currency
+    setSwapCurrency(value);
+  };
+  
+  const handleForCurrencyChange = (event: SelectChangeEvent) => {
+    const value = event.target.value as string;
+    if (value === swapCurrency) return; // Prevent selecting the same currency
+    setForCurrency(value);
+  };
+  
   const farmContract = '0x43D01420604f84308923542aB6959B7f13C9B766';
-  
   const wethAddress = '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14';
   const usdcAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238';
-  const uniAddress = "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984";
-
+  const uniAddress = '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984';
   
-async function getSigner() {
-    if (typeof window.ethereum === "undefined") {
-        console.error("Metamask is not installed");
-        return null;
+  async function getSigner() {
+    if (typeof window.ethereum === 'undefined') {
+      console.error('Metamask is not installed');
+      return null;
     }
-
+  
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
+    await provider.send('eth_requestAccounts', []);
     const signer = provider.getSigner();
-
-    console.log("Signer Address:", await signer.getAddress());
+  
+    console.log('Signer Address:', await signer.getAddress());
     return signer;
-}
-
-
-
+  }
+  
   const grantAllowance = async () => {
-    const signer = await getSigner()
+    const signer = await getSigner();
     const amount = ethers.utils.parseEther('1000');
-
-    // @ts-ignore //
+  
+    // @ts-ignore
     const tokenA = new ethers.Contract(wethAddress, erc20Abi, signer);
     await tokenA.approve(farmContract, amount);
-  }
-
-
+  };
+  
   // Add Liquidity
   const addLiquidity = async () => {
-  
-    // @ts-ignore //
+    // @ts-ignore
     await writeContract({
       address: farmContract,
       abi: farmAbi,
       functionName: 'addLiquidity',
-      args: [usdcAddress, uniAddress, ethers.utils.parseEther('10'), ethers.utils.parseEther('0.0000001')],
-    })
-  }
-
-
-  /////////////////////  Swap on Sepolia  /////////////////
-  const onSwap = async () => {
-
+      args: [
+        usdcAddress,
+        uniAddress,
+        ethers.utils.parseEther('10'),
+        ethers.utils.parseEther('0.0000001')
+      ]
+    });
+  };
   
-    // in the parse ether field, we need to pass the amount of the token we want to swap
+  // Swap Function
+  const onSwap = async () => {
+    if (!swapAmount || parseFloat(swapAmount) <= 0) {
+      console.error('Invalid swap amount');
+      return;
+    }
+  
     const amountIn = ethers.utils.parseEther(swapAmount);
     const amountOutMin = 1;
-
-    // @ts-ignore //
+  
+    // @ts-ignore
     const tx2 = await writeContract({
       address: farmContract,
       abi: farmAbi,
-      functionName: 'swap',     
-      args: [amountIn, amountOutMin, wethAddress, uniAddress, address],
+      functionName: 'swap',
+      args: [amountIn, amountOutMin, wethAddress, uniAddress, address]
     });
-
+  
     console.log('tx 2', tx2);
-
-  }
+  };
+  
 
   const RenderButton = () => { 
 
@@ -281,10 +419,11 @@ async function getSigner() {
               label="Select Token"
               displayEmpty
               renderValue={(selected) => (selected ? selected : '')}
-              onChange={handleSwapCurrnecyChange}
+              onChange={handleSwapCurrencyChange}
               sx={{
                 m:0,
                 fontSize: '18px',
+                textAlign:'end',
                 color: 'white', // Text color inside the Select
                 '& .MuiSelect-select': {
                   fontSize: '18px', // Ensures selected option appears with 12px font size
@@ -333,9 +472,19 @@ async function getSigner() {
           </FormControl>
         </Grid>
 
-        <Grid display={'flex'} justifyContent={'space-between'} width={'100%'}>
+        {swapCurrency && (
+          <Grid display="flex" justifyContent="space-between" width="100%">
+            <Typography color="#F6F6F6" fontSize="10px" sx={{ opacity: "0.5" }}>
+              1 {swapCurrency} = {Number(swapToUsdtRate).toFixed(3)} USDT
+            </Typography>
+            <Typography color="#F6F6F6" fontSize="10px" sx={{ opacity: "0.5" }}>
+              Wallet = {Number(swapBalance).toFixed(3)} {swapCurrency}
+            </Typography>
+          </Grid>
+        )}
       
-        </Grid>
+              
+      
       </InputContainer>
 
 
@@ -343,7 +492,7 @@ async function getSigner() {
       <Grid sx={{display:'flex' , alignItems:'center', justifyContent:'center', width:'100%', position: 'relative'}}>
         <SwapVerticalCircleIcon fontSize='large' sx={{ position: 'absolute', top: '-20px' }}/>        
       </Grid>
-
+              
       <InputContainer container minHeight={'120px'} sx={{ marginTop: '2px', marginBottom:'20px'}}> 
         <Grid display={'flex'} justifyContent={'space-between'} width={'100%'}>
           <Typography color={'#F6F6F6'} fontSize={'16px'}>
@@ -359,7 +508,7 @@ async function getSigner() {
         <Grid container alignItems={'center'} sx={{ flexWrap: 'nowrap' }}>
           <Input
             placeholder="0"
-            value={forAmount}
+            value={swapAmount ? (Number(swapAmount) * Number(conversionRate)).toFixed(5) : '0'}
             // onChange={e => {
             //   const formattedValue = validateAndFormatInput(e.target.value)
             //   setDepositAmount(formattedValue)
@@ -396,10 +545,12 @@ async function getSigner() {
               label="Select Token"
               displayEmpty
               renderValue={(selected) => (selected ? selected : '')}
-              onChange={handleForCurrnecyChange}
+              onChange={handleForCurrencyChange}
+              
               sx={{
                 m:0,
                 fontSize: '18px',
+                textAlign:'end',
                 color: 'white', // Text color inside the Select
                 '& .MuiSelect-select': {
                   fontSize: '18px', // Ensures selected option appears with 12px font size
@@ -448,15 +599,24 @@ async function getSigner() {
           </FormControl>
         </Grid>
 
-        <Grid display={'flex'} justifyContent={'space-between'} width={'100%'}>
+        {forCurrency && (
+          <Grid display="flex" justifyContent="space-between" width="100%">
+            <Typography color="#F6F6F6" fontSize="10px" sx={{ opacity: "0.5" }}>
+              1 {forCurrency} = {Number(forToUsdtRate).toFixed(3)} USDT
+            </Typography>
+            <Typography color="#F6F6F6" fontSize="10px" sx={{ opacity: "0.5" }}>
+              Wallet = {Number(forBalance).toFixed(3)} {forCurrency}
+            </Typography>
+          </Grid>
+        )}
       
-        </Grid>
       </InputContainer>
     
-      {(swapCurrency&&forCurrency)&&
-      <Typography margin={"auto"} fontSize={"12px"}>
-        {swapRate} {swapCurrency} = {forRate} {forCurrency}
-      </Typography>}
+      {(swapCurrency && forCurrency) && (
+        <Typography margin="auto" fontSize="12px">
+          1 {swapCurrency} = {conversionRate} {forCurrency}
+        </Typography>
+      )}
       <RenderButton />
       
     </Grid>
