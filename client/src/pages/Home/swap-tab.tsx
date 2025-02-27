@@ -1,19 +1,17 @@
 import { Button, Chip, FormControl, Grid, Input, InputLabel, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { InputContainer, StakingContainer } from './styles'
 // import TabsComponent from './tabs'
 import { validateAndFormatInput } from '../../../src/utils/index'
 import {  ethers } from 'ethers'
 import WalletButtons from '@components/WalletButtons'
-import { useAccount, useWriteContract, useWalletClient, useChainId } from 'wagmi'
+import { useAccount, useWriteContract, useWalletClient, useChainId, usePublicClient } from 'wagmi'
 import {ConnectionType} from '../../connection/index'
-// import {VanarToken} from '../../assets/index'
 import { farmAbi } from '@components/StakingTabs/farmContract'
-import { erc20Abi } from 'viem'
+import { erc20Abi, parseSignature } from 'viem'
 import { useSwitchChain } from 'wagmi'
 import SwapVerticalCircleIcon from '@mui/icons-material/SwapVerticalCircle';
 import { CryptoInterface } from './analytics'
-
 
 const SwapTab = () => {
   const swapableCurrencyList = [
@@ -40,7 +38,7 @@ const SwapTab = () => {
   const { chains, switchChain } = useSwitchChain();
   const chainId = useChainId();
   
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, connector } = useAccount();
   const [swapCurrency, setSwapCurrency] = useState('');
   const [forCurrency, setForCurrency] = useState('');
   const [swapAmount, setSwapAmount] = useState('');
@@ -53,6 +51,44 @@ const SwapTab = () => {
 
   const [swapBalance, setSwapBalance] = useState('0');
   const [forBalance, setForBalance] = useState('0');
+
+  const uniswapV2RouterAddress = "0xeE567Fe1712Faf6149d80dA1E6934E354124CfE3";
+  const usdcToken = '0xe32732cc1277D797EBE9F7E9DD27D226515b3e24';
+  const toroToken = '0xf00F3d216daA095Bd0eeB5607806BB46c3aCe85b';
+  const pairAddress = "0x9bF5A5D4a69d3111078Fa925b8C8CefAE53f0dE7";
+
+
+  const fetchPair = async () => {
+    if(window.ethereum) {
+
+      // console.clear()
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      console.log('provider eth', provider);
+
+      const pairContract = new ethers.Contract(pairAddress, [
+        "function getReserves() external view returns (uint112, uint112, uint32)"
+      ], provider);
+
+    const [reserve0, reserve1] = await pairContract.getReserves();
+
+    console.log("Reserve 0:", ethers.utils.formatUnits(reserve0, 18));
+    console.log("Reserve 1:", ethers.utils.formatUnits(reserve1, 18));
+
+    if (reserve0 === 0 || reserve1 === 0) {
+      console.error("❌ Error: The pair exists, but has NO liquidity.");
+    } else {
+      console.log("✅ Pair has liquidity.");
+    }
+    }
+}
+
+
+  useEffect(() => {
+    (async () => {
+      await fetchPair();
+    }) ()
+
+  })
   
   // Fetch real-time crypto data
   useEffect(() => {
@@ -213,8 +249,6 @@ useEffect(() => {
   const getTokenBalance = async (tokenAddress: string) => {
     if (!address || !window.ethereum) return;
 
-        
-
   
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -275,26 +309,36 @@ useEffect(() => {
     const signer = await getSigner();
     const amount = ethers.utils.parseEther('1000');
   
+    const tokenAAddress = toroToken;
+
     // @ts-ignore
-    const tokenA = new ethers.Contract(wethAddress, erc20Abi, signer);
-    await tokenA.approve(farmContract, amount);
+    const tokenA = new ethers.Contract(tokenAAddress, erc20Abi, signer);
+    await tokenA.approve(pairAddress, amount);
   };
-  
-  // Add Liquidity
-  const addLiquidity = async () => {
+
+  const removeLiquidity = async () => {
+    const amount = ethers.utils.parseEther('10');
     // @ts-ignore
     await writeContract({
       address: farmContract,
       abi: farmAbi,
-      functionName: 'addLiquidity',
-      args: [
-        usdcAddress,
-        uniAddress,
-        ethers.utils.parseEther('10'),
-        ethers.utils.parseEther('0.0000001')
-      ]
+      functionName: 'removeLiquidity',
+      args: [usdcToken, toroToken],
     });
-  };
+  }
+
+  const addLiquidity = async () => {
+   
+    const amount = ethers.utils.parseEther('10');
+    // @ts-ignore //
+    await writeContract({
+      address: farmContract,
+      abi: farmAbi,
+      functionName: 'addLiquidity',
+      args: [usdcToken, toroToken, amount, amount],
+    })
+  }
+
   
   // Swap Function
   const onSwap = async () => {
@@ -302,8 +346,11 @@ useEffect(() => {
       console.error('Invalid swap amount');
       return;
     }
-  
+    
+    // console.clear();
+    console.log('swap amount', swapAmount);
     const amountIn = ethers.utils.parseEther(swapAmount);
+    console.log('amount in', amountIn.toString());
     const amountOutMin = 1;
   
     // @ts-ignore
@@ -311,7 +358,7 @@ useEffect(() => {
       address: farmContract,
       abi: farmAbi,
       functionName: 'swap',
-      args: [amountIn, amountOutMin, wethAddress, uniAddress, address]
+      args: [amountIn, amountOutMin, usdcToken, toroToken, address]
     });
   
     console.log('tx 2', tx2);
@@ -329,6 +376,7 @@ useEffect(() => {
       )
     else
       return (
+    <div>
       <Button
           variant="contained"
           sx={{
@@ -343,6 +391,10 @@ useEffect(() => {
         >
           Swap
         </Button>
+        <button onClick={addLiquidity} >Add Liquidity</button>
+        <button onClick={grantAllowance} >Grant Allowance</button>
+        <button onClick={removeLiquidity} >Remove liquidity</button>
+        </div>
       )
   }
 

@@ -18,6 +18,7 @@ import {
   useWaitForTransactionReceipt,
   useReadContract,
   useSwitchChain,
+  useBalance,
 } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { Address, createPublicClient, erc20Abi } from "viem";
@@ -56,11 +57,23 @@ const Stake = () => {
     }
   }, []);
 
+  const { data: ethBalance, refetch: refetchEthBalance } = useBalance({
+    address,
+    chainId: 17000, // Holesky Chain ID
+  });
+
   const {
     status,
     isSuccess: isTxSuccess,
     isError: isTxError,
   } = useWaitForTransactionReceipt({ hash: data });
+
+  useEffect(() => {
+    if(ethBalance) {
+      console.log('eth balance', ethBalance.formatted);
+      setBalance(ethBalance.formatted);
+    }
+  }, [address, ethBalance])
 
   const onStake = async () => {
     console.log("hello");
