@@ -21,9 +21,9 @@ const SwapTab = () => {
       address: '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14'
     },
     {
-      name: 'USDT',
-      symbol: 'USDT',
-      address: '0xdAC17F958D2ee523a2206206994597C13D831ec7'
+      name: 'USDC',
+      symbol: 'USDC',
+      address: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
     },
     {
       name: 'UNI',
@@ -327,38 +327,35 @@ useEffect(() => {
     });
   }
 
-  const addLiquidity = async () => {
-   
-    const amount = ethers.utils.parseEther('10');
-    // @ts-ignore //
-    await writeContract({
-      address: farmContract,
-      abi: farmAbi,
-      functionName: 'addLiquidity',
-      args: [usdcToken, toroToken, amount, amount],
-    })
-  }
 
   
   // Swap Function
   const onSwap = async () => {
+    console.clear();
+    const tokenA = swapableCurrencyList.find((token) => token.symbol === swapCurrency);
+    const tokenB = swapableCurrencyList.find((token) => token.symbol === forCurrency);
+
+    console.log('token a and b', tokenA, tokenB)
     if (!swapAmount || parseFloat(swapAmount) <= 0) {
       console.error('Invalid swap amount');
       return;
     }
     
     // console.clear();
-    console.log('swap amount', swapAmount);
-    const amountIn = ethers.utils.parseEther(swapAmount);
-    console.log('amount in', amountIn.toString());
-    const amountOutMin = 1;
+    // console.log('swap amount', swapAmount);
+    // const amountIn = ethers.utils.parseEther(swapAmount);
+    // console.log('amount in', amountIn.toString());
+    // const amountOutMin = 1;
   
+    const amountIn = ethers.utils.parseEther(swapAmount.toString());
+    const amountOutMin = 1;
+
     // @ts-ignore
     const tx2 = await writeContract({
       address: farmContract,
       abi: farmAbi,
       functionName: 'swap',
-      args: [amountIn, amountOutMin, usdcToken, toroToken, address]
+      args: [amountIn, amountOutMin, tokenA?.address, tokenB?.address, address]
     });
   
     console.log('tx 2', tx2);
@@ -376,7 +373,6 @@ useEffect(() => {
       )
     else
       return (
-    <div>
       <Button
           variant="contained"
           sx={{
@@ -391,10 +387,6 @@ useEffect(() => {
         >
           Swap
         </Button>
-        <button onClick={addLiquidity} >Add Liquidity</button>
-        <button onClick={grantAllowance} >Grant Allowance</button>
-        <button onClick={removeLiquidity} >Remove liquidity</button>
-        </div>
       )
   }
 

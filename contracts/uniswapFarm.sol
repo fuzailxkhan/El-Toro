@@ -107,15 +107,14 @@ contract TestAddLiquidity {
             block.timestamp + 86400);
 
         return (amountA, amountB, liquidity);
-
     }
 
       function removeLiquidity(
         address _tokenA,
         address _tokenB
+        // uint liquidity
     ) public returns(uint amountA, uint amountB) {
 
-        // address pair = 0xbB6d2561a7543A8F6Ad9eFa787Ce7Ab3f2E5F3fC;
         address pair = IUniswapV2Factory(FACTORY).getPair(_tokenA, _tokenB);
 
 

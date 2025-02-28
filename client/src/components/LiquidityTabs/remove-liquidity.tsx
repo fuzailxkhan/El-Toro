@@ -3,11 +3,12 @@ import { AddLiquidityContainer, InputContainer } from '@pages/Home/styles'
 import { validateAndFormatInput } from '../../../src/utils/index'
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import React, { useEffect, useState } from 'react'
-import { useAccount } from 'wagmi';
+import { useAccount, useWriteContract } from 'wagmi';
 import { ethers } from 'ethers';
 import { erc20Abi } from 'viem';
 import WalletButtons from '@components/WalletButtons';
 import { ConnectionType } from '../../connection/index';
+import { farmAbi } from '@components/StakingTabs/farmContract';
 
 const RemoveLiquidity = () => {
 
@@ -23,8 +24,26 @@ const RemoveLiquidity = () => {
     const { address, isConnected } = useAccount();
 
 
-    const onRemoveLiquidity = () =>{
         console.log("Liquidate")
+        const { writeContract } = useWriteContract();
+    
+    const onRemoveLiquidity = async () => {
+      const farmContract = '0x43D01420604f84308923542aB6959B7f13C9B766';
+
+         
+            const alphaToken = "0xfAC5236D60Ba219268d1ef73720a94DB34dee72b";
+            const betaToken = "0xd34c3b5F65dD10668a4EeaeD447567Eb797bB94d"
+           
+            console.log('adding liqduity')
+           
+            // @ts-ignore //
+            await writeContract({
+              address: farmContract,
+              abi: farmAbi,
+              functionName: 'removeLiquidity',
+              args: [alphaToken, betaToken],
+            })
+          
     }
 
 
@@ -61,17 +80,16 @@ return (
   <Grid container marginTop={'28px'} >
             <Grid display={'flex'} justifyContent={'space-between'} width={'100%'} sx={{marginTop:'-10px',marginBottom:'10px'}}>
               <Typography fontSize={'16px'} fontWeight={'500'} color={'#F6F6F6'} margin={'auto'}  sx={{ opacity: '0.7' }}>
-                Remove TORO/USDC pair from Liquidity 
+                Remove ALPHA/BETA pair from Liquidity 
               </Typography>
             </Grid>
   <InputContainer container minHeight={'120px'} sx={{marginBottom:'2px' ,marginTop:'2px'}}>
     <Grid display={'flex'} justifyContent={'space-between'} width={'100%'} sx={{marginTop:'0px'}}>
       <Typography color={'#F6F6F6'} fontSize={'16px'}>
-        Remove Toro 
+        Remove ALPHA 
       </Typography>
 
       <Grid display={'flex'} alignItems={'center'}>
-        {/* <img src={VanarToken} height={'18px'} /> */}
         
       </Grid>
     </Grid>
@@ -120,7 +138,7 @@ return (
   <InputContainer container minHeight={'120px'} sx={{ marginTop: '2px', marginBottom:'20px'}}> 
     <Grid display={'flex'} justifyContent={'space-between'} width={'100%'}>
       <Typography color={'#F6F6F6'} fontSize={'16px'}>
-        Remove USDC 
+        Remove BETA 
       </Typography>
 
       <Grid display={'flex'} alignItems={'center'}>

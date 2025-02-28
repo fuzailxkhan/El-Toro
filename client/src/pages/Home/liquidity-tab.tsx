@@ -48,7 +48,7 @@ const LiquidityTab = () => {
           handleChange={handleTabChange}
           tabNames={[
             { name: 'Add Liquidity' },
-            { name: 'Remove' },
+            { name: 'Remove Liquidity' },
           ]}
           xsValue={12}
           mdValue={12}
