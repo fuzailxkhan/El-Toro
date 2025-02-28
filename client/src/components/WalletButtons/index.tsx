@@ -109,7 +109,7 @@ const WalletButtons: FC<Props> = props => {
     if (connectionType) {
       const connector = getConnection(
         connectionType as ConnectionType,
-      ).connector
+      )?.connector
 
       tryActivation(connector)
     }
@@ -126,7 +126,7 @@ const WalletButtons: FC<Props> = props => {
         //  setWalletView(WALLET_VIEWS.PENDING)
         //  dispatch(updateConnectionError({ connectionType, error: undefined }))
 
-        await connector.activate()
+        await connector?.activate()
         dispatch(setSelectedWallet(connectionType))
       } catch (error) {
         console.error(`web3-react connection error: ${error}`)
@@ -151,8 +151,8 @@ const WalletButtons: FC<Props> = props => {
     sessionStorage.removeItem('account')
     sessionStorage.removeItem('signature')
 
-    connector.deactivate && connector.deactivate()
-    connector.resetState && connector.resetState()
+    connector?.deactivate && connector?.deactivate()
+    connector?.resetState && connector?.resetState()
   }
 
   const handleDisconnectWallet = () => {

@@ -98,6 +98,30 @@ export const StakingContainer = styled(Grid)(({ theme }) => ({
   alignContent: 'flex-start',
 }))
 
+export const AddLiquidityContainer = styled(Grid)(({ theme }) => ({
+  padding: '24px',
+  borderRadius: '24px',
+  background: '#020202',
+  border: '1.5px solid #F6F6F61A',
+  backgroundImage: `url(${Backdrop})`,
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'center',
+  backgroundSize: 'cover',
+  alignContent: 'flex-start',
+}))
+
+export const LiquidityContainer = styled(Grid)(({ theme }) => ({
+  padding: '24px',
+  borderRadius: '24px',
+  background: '#020202',
+  border: '1.5px solid #F6F6F61A',
+  backgroundImage: `url(${Backdrop})`,
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'center',
+  backgroundSize: 'cover',
+  alignContent: 'flex-start',
+}))
+
 export const InputContainer = styled(Grid)(({ theme }) => ({
   padding: '16px 24px 16px 24px',
   gap: '12px',

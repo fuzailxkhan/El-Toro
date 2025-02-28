@@ -477,9 +477,9 @@ useEffect(() => {
             <Typography color="#F6F6F6" fontSize="10px" sx={{ opacity: "0.5" }}>
               1 {swapCurrency} = {Number(swapToUsdtRate).toFixed(3)} USDT
             </Typography>
-            <Typography color="#F6F6F6" fontSize="10px" sx={{ opacity: "0.5" }}>
+            {address&&<Typography color="#F6F6F6" fontSize="10px" sx={{ opacity: "0.5" }}>
               Wallet = {Number(swapBalance).toFixed(3)} {swapCurrency}
-            </Typography>
+            </Typography>}
           </Grid>
         )}
       
@@ -604,9 +604,9 @@ useEffect(() => {
             <Typography color="#F6F6F6" fontSize="10px" sx={{ opacity: "0.5" }}>
               1 {forCurrency} = {Number(forToUsdtRate).toFixed(3)} USDT
             </Typography>
-            <Typography color="#F6F6F6" fontSize="10px" sx={{ opacity: "0.5" }}>
+            {address&&<Typography color="#F6F6F6" fontSize="10px" sx={{ opacity: "0.5" }}>
               Wallet = {Number(forBalance).toFixed(3)} {forCurrency}
-            </Typography>
+            </Typography>}
           </Grid>
         )}
       

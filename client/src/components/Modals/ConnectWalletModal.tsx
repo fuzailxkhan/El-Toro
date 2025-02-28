@@ -29,7 +29,7 @@ const ConnectWalletModal: React.FC<Props> = ({ open, setOpen, wallets }) => {
     if (connectionType) {
       const connector = getConnection(
         connectionType as ConnectionType,
-      ).connector
+      )?.connector
 
       tryActivation(connector)
     }
@@ -46,7 +46,7 @@ const ConnectWalletModal: React.FC<Props> = ({ open, setOpen, wallets }) => {
         //  setWalletView(WALLET_VIEWS.PENDING)
         //  dispatch(updateConnectionError({ connectionType, error: undefined }))
 
-        await connector.activate()
+        await connector?.activate()
         dispatch(setSelectedWallet(connectionType))
         setOpen(false)
       } catch (error) {
@@ -69,8 +69,8 @@ const ConnectWalletModal: React.FC<Props> = ({ open, setOpen, wallets }) => {
     sessionStorage.removeItem('account')
     sessionStorage.removeItem('signature')
 
-    connector.deactivate && connector.deactivate()
-    connector.resetState && connector.resetState()
+    connector?.deactivate && connector?.deactivate()
+    connector?.resetState && connector?.resetState()
   }
 
   return (

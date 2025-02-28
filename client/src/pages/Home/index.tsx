@@ -8,6 +8,7 @@ import { FormContainerStyled } from '@components/FormContainer/styles'
 import StatsTab from './stats-tab'
 import Analytics from './analytics'
 import SwapTab from './swap-tab'
+import LiquidityTab from './liquidity-tab'
 
 
 const Home = () => {
@@ -20,7 +21,8 @@ const Home = () => {
   const renderTab = () => {
     if (tab === 0) return <StakingTab />
     else if (tab === 1) return <SwapTab/>
-    else if (tab === 2) return <StatsTab />
+    // else if (tab === 2) return <StatsTab />
+    else if (tab ===2) return <LiquidityTab />
     else if (tab===3) return <Analytics />
   }
 
@@ -42,7 +44,7 @@ const Home = () => {
           tabNames={[
             { name: 'Staking' },
             { name: 'Swap' }, 
-            { name: 'Statistics' },
+            { name: 'Liquidity' },
             { name: 'Analytics' }
           ]}
           xsValue={10}
