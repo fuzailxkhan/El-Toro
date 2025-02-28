@@ -80,17 +80,16 @@ return (
   <Grid container marginTop={'28px'} >
             <Grid display={'flex'} justifyContent={'space-between'} width={'100%'} sx={{marginTop:'-10px',marginBottom:'10px'}}>
               <Typography fontSize={'16px'} fontWeight={'500'} color={'#F6F6F6'} margin={'auto'}  sx={{ opacity: '0.7' }}>
-                Remove TORO/USDC pair from Liquidity 
+                Remove ALPHA/BETA pair from Liquidity 
               </Typography>
             </Grid>
   <InputContainer container minHeight={'120px'} sx={{marginBottom:'2px' ,marginTop:'2px'}}>
     <Grid display={'flex'} justifyContent={'space-between'} width={'100%'} sx={{marginTop:'0px'}}>
       <Typography color={'#F6F6F6'} fontSize={'16px'}>
-        Remove Toro 
+        Remove ALPHA 
       </Typography>
 
       <Grid display={'flex'} alignItems={'center'}>
-        {/* <img src={VanarToken} height={'18px'} /> */}
         
       </Grid>
     </Grid>
@@ -139,7 +138,7 @@ return (
   <InputContainer container minHeight={'120px'} sx={{ marginTop: '2px', marginBottom:'20px'}}> 
     <Grid display={'flex'} justifyContent={'space-between'} width={'100%'}>
       <Typography color={'#F6F6F6'} fontSize={'16px'}>
-        Remove USDC 
+        Remove BETA 
       </Typography>
 
       <Grid display={'flex'} alignItems={'center'}>

@@ -142,13 +142,13 @@ const AddLiquidity = () => {
     <Grid container marginTop={'28px'} >
         <Grid display={'flex'} justifyContent={'space-between'} width={'100%'} sx={{marginTop:'-10px',marginBottom:'10px'}}>
           <Typography fontSize={'16px'} fontWeight={'500'} color={'#F6F6F6'} margin={'auto'}  sx={{ opacity: '0.7' }}>
-            Deposit TORO/USDC pair Liquidity 
+            Deposit ALPHA/BETA pair Liquidity 
           </Typography>
         </Grid>
       <InputContainer container minHeight={'120px'} sx={{marginBottom:'2px' ,marginTop:'2px'}}>
         <Grid display={'flex'} justifyContent={'space-between'} width={'100%'} sx={{marginTop:'0px'}}>
           <Typography color={'#F6F6F6'} fontSize={'16px'}>
-            Deposit Toro 
+            Deposit ALPHA 
           </Typography>
         </Grid>
 
@@ -176,7 +176,7 @@ const AddLiquidity = () => {
             }}
             
           />
-          <FormControl variant="standard" sx={{ minWidth: '80px', color: 'white', fontSize: '12px', marginTop:0 }}>
+          {/* <FormControl variant="standard" sx={{ minWidth: '80px', color: 'white', fontSize: '12px', marginTop:0 }}>
             {!fromCurrency && (
               <InputLabel
                 id="demo-simple-select-standard-label"
@@ -223,26 +223,9 @@ const AddLiquidity = () => {
                 },
               }}
             >
-              {/* {currencyList.map((curr) => (
-                <MenuItem
-                  key={curr.address}
-                  value={curr.symbol}
-                  sx={{
-                    fontSize: '16px',
-                    color: 'white', // Text color of MenuItem
-                    '&.Mui-selected': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.2)', // Background of selected item
-                    },
-                    '&.Mui-selected:hover': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.3)', // Background on hover when selected
-                    },
-                  }}
-                >
-                  {curr.symbol}
-                </MenuItem>
-              ))} */}
+              
             </Select>
-          </FormControl>
+          </FormControl> */}
         </Grid>
       
               
@@ -258,7 +241,7 @@ const AddLiquidity = () => {
       <InputContainer container minHeight={'120px'} sx={{ marginTop: '2px', marginBottom:'20px'}}> 
         <Grid display={'flex'} justifyContent={'space-between'} width={'100%'}>
           <Typography color={'#F6F6F6'} fontSize={'16px'}>
-            Deposit USDC 
+            Deposit BETA 
           </Typography>
 
           <Grid display={'flex'} alignItems={'center'}>
@@ -270,7 +253,7 @@ const AddLiquidity = () => {
         <Grid container alignItems={'center'} sx={{ flexWrap: 'nowrap' }}>
           <Input
             placeholder="0"
-            value={fromAmount}
+            value={toroAmount}
             // value={forAmount ? (Number(forAmount) * Number(conversionRate)).toFixed(5) : '0'}
             // onChange={e => {
             //   const formattedValue = validateAndFormatInput(e.target.value)
@@ -294,7 +277,7 @@ const AddLiquidity = () => {
               style: { textAlign: "right" }, // Aligns text to the right
             }}
           />
-          <FormControl variant="standard" sx={{ minWidth: '80px', color: 'white', fontSize: '12px' }}>
+          {/* <FormControl variant="standard" sx={{ minWidth: '80px', color: 'white', fontSize: '12px' }}>
             {!forCurrency && (
               <InputLabel
                 id="demo-simple-select-standard-label"
@@ -361,7 +344,7 @@ const AddLiquidity = () => {
                 </MenuItem>
               ))}
             </Select>
-          </FormControl>
+          </FormControl> */}
         </Grid>
 
       
