@@ -3,11 +3,12 @@ import { AddLiquidityContainer, InputContainer } from '@pages/Home/styles'
 import { validateAndFormatInput } from '../../../src/utils/index'
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import React, { useEffect, useState } from 'react'
-import { useAccount } from 'wagmi';
+import { useAccount, useWriteContract } from 'wagmi';
 import { ethers } from 'ethers';
 import { erc20Abi } from 'viem';
 import WalletButtons from '@components/WalletButtons';
 import { ConnectionType } from '../../connection/index';
+import { farmAbi } from '@components/StakingTabs/farmContract';
 
 const RemoveLiquidity = () => {
 
@@ -23,8 +24,26 @@ const RemoveLiquidity = () => {
     const { address, isConnected } = useAccount();
 
 
-    const onRemoveLiquidity = () =>{
         console.log("Liquidate")
+        const { writeContract } = useWriteContract();
+    
+    const onRemoveLiquidity = async () => {
+      const farmContract = '0x43D01420604f84308923542aB6959B7f13C9B766';
+
+         
+            const alphaToken = "0xfAC5236D60Ba219268d1ef73720a94DB34dee72b";
+            const betaToken = "0xd34c3b5F65dD10668a4EeaeD447567Eb797bB94d"
+           
+            console.log('adding liqduity')
+           
+            // @ts-ignore //
+            await writeContract({
+              address: farmContract,
+              abi: farmAbi,
+              functionName: 'removeLiquidity',
+              args: [alphaToken, betaToken],
+            })
+          
     }
 
 

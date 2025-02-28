@@ -45,6 +45,7 @@ const Unstake = () => {
       gas: BigInt(74000),
     });
     console.log("contract res", contractRes);
+    setWithdrawAmount('0')
   };
 
   const RenderButton = () => {
