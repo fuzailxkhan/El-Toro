@@ -10,96 +10,20 @@ import WalletButtons from '@components/WalletButtons';
 import { ConnectionType } from '../../connection/index';
 
 const RemoveLiquidity = () => {
-  const currencyList = [
-    {
-      name: 'ETH',
-      symbol: 'ETH',
-      address: '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14'
-    },
-    {
-      name: 'USDT',
-      symbol: 'USDT',
-      address: '0xdAC17F958D2ee523a2206206994597C13D831ec7'
-    },
-    {
-      name: 'UNI',
-      symbol: 'UNI',
-      address: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984'
-    }
-  ];
 
-const [fromCurrency,setFromCurrency] = useState('')
-const [fromAmount,setFromAmount] = useState('')
+    const [toroAmount,setToroAmount] = useState('')
 
-const [forCurrency, setForCurrency] = useState('')
-const [forAmount,setForAmount] = useState('')
+    const [usdcAmount,setUsdcAmount] = useState('')
 
-const [conversionRate,setConversionRate] = useState('')
-
-const [forBalance,setForBalance] = useState('')
-const [fromBalance,setFromBalance] = useState('')
-
-const { address, isConnected } = useAccount();
-
-useEffect(() => {
-  if (!address || !forCurrency) return;
-
-  if(window.ethereum){
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // ✅ Define inside effect
-
-
-    if (forCurrency === 'ETH') {
-      provider.getBalance(address).then(balance => {
-        setForBalance(ethers.utils.formatEther(balance));
-      });
-    } else {
-
-        const token = currencyList.find((token) => token.symbol === fromCurrency);
-          
-        if (token) {
-        getTokenBalance(token.address).then(balance => {
-          setForBalance(balance || '0');
-        });}else{
-          console.error("Token not Found",forCurrency);
-          setForBalance('0')
-        }
-    }
-  }
-}, [forCurrency, address]);
-
-
-const handleFromCurrencyChange = (event: SelectChangeEvent) => {
-    const value = event.target.value as string;
-    if (value === forCurrency) return; // Prevent selecting the same currency
-    setFromCurrency(value);
-  };
-
-const handleForCurrencyChange = (event: SelectChangeEvent) => {
-    const value = event.target.value as string;
-    if (value === fromCurrency) return; // Prevent selecting the same currency
-    setForCurrency(value);
-  };
-
-    const getTokenBalance = async (tokenAddress: string) => {
-      if (!address || !window.ethereum) return;
-  
-          
-  
+    // const [conversionRate,setConversionRate] = useState('')
     
-      try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const contract = new ethers.Contract(tokenAddress, erc20Abi, signer);
-    
-        const balance = await contract.balanceOf(address);
-        return ethers.utils.formatUnits(balance, 18); // Assuming 18 decimal places
-      } catch (error) {
-        console.error("Error fetching token balance:", error);
-      }
-    };
+    // const [toroBalance,setToroBalance] = useState('')
+    // const [usdcBalance,setUsdcBalance] = useState('')
 
-    const onLiquidate = () =>{
+    const { address, isConnected } = useAccount();
+
+
+    const onRemoveLiquidity = () =>{
         console.log("Liquidate")
     }
 
@@ -123,7 +47,7 @@ const handleForCurrencyChange = (event: SelectChangeEvent) => {
                 width: '100%',
                 marginTop: '15px',
               }}
-              onClick={onLiquidate}
+              onClick={onRemoveLiquidity}
               // disabled={!depositAmount}
               // disabled={true}
             >
@@ -134,11 +58,16 @@ const handleForCurrencyChange = (event: SelectChangeEvent) => {
 
 return (
 
-<Grid container marginTop={'28px'} >
+  <Grid container marginTop={'28px'} >
+            <Grid display={'flex'} justifyContent={'space-between'} width={'100%'} sx={{marginTop:'-10px',marginBottom:'10px'}}>
+              <Typography fontSize={'16px'} fontWeight={'500'} color={'#F6F6F6'} margin={'auto'}  sx={{ opacity: '0.7' }}>
+                Remove TORO/USDC pair from Liquidity 
+              </Typography>
+            </Grid>
   <InputContainer container minHeight={'120px'} sx={{marginBottom:'2px' ,marginTop:'2px'}}>
     <Grid display={'flex'} justifyContent={'space-between'} width={'100%'} sx={{marginTop:'0px'}}>
       <Typography color={'#F6F6F6'} fontSize={'16px'}>
-        From 
+        Remove Toro 
       </Typography>
 
       <Grid display={'flex'} alignItems={'center'}>
@@ -150,10 +79,10 @@ return (
     <Grid container alignItems={'center'} sx={{ flexWrap: 'nowrap'}}>
       <Input
         placeholder="0"
-        value={fromAmount}
+        value={toroAmount}
         onChange={e => {
           const formattedValue = validateAndFormatInput(e.target.value)
-          setFromAmount(formattedValue)
+          setToroAmount(formattedValue)
         }}
         onKeyDown={e => {
           if (e.key === 'e' || e.key === '-' || e.key === '+') {
@@ -161,91 +90,22 @@ return (
           }
         }}
         disableUnderline
+        disabled
         type="number"
         sx={{
-          width: '100%'
+          textAlign:"end",
+          width: '100%',
+          color: 'gray',
+          '& .MuiInputBase-input.Mui-disabled': {
+              WebkitTextFillColor: '#175b4d', // Ensures color override
+            },
+        }}
+        inputProps={{
+          style: { textAlign: "right" }, // Aligns text to the right
         }}
         
       />
-      <FormControl variant="standard" sx={{ minWidth: '80px', color: 'white', fontSize: '12px', marginTop:0 }}>
-        {!fromCurrency && (
-          <InputLabel
-            id="demo-simple-select-standard-label"
-            sx={{ color: 'white', fontSize: '16px', mb:'5px' }}
-          >
-            Token
-          </InputLabel>
-        )}
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={fromCurrency}
-          label="Select Token"
-          displayEmpty
-          renderValue={(selected) => (selected ? selected : '')}
-          onChange={handleFromCurrencyChange}
-          sx={{
-            m:0,
-            fontSize: '18px',
-            textAlign:'end',
-            color: 'white', // Text color inside the Select
-            '& .MuiSelect-select': {
-              fontSize: '18px', // Ensures selected option appears with 12px font size
-            },
-            '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'white', // Border color when not focused
-            },
-            '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'white', // Border color on hover
-            },
-            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'white', // Border color when focused
-            },
-          }}
-          MenuProps={{
-            PaperProps: {
-              sx: {
-                bgcolor: '#121212', // Dropdown background color
-                color: 'white', // Dropdown text color
-                fontSize: '16px',
-                borderColor:'transparent',
-                textAlign:'start'
-              },
-            },
-          }}
-        >
-          {currencyList.map((curr) => (
-            <MenuItem
-              key={curr.address}
-              value={curr.symbol}
-              sx={{
-                fontSize: '16px',
-                color: 'white', // Text color of MenuItem
-                '&.Mui-selected': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)', // Background of selected item
-                },
-                '&.Mui-selected:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.3)', // Background on hover when selected
-                },
-              }}
-            >
-              {curr.symbol}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
     </Grid>
-
-    {/* {swapCurrency && (
-      <Grid display="flex" justifyContent="space-between" width="100%">
-        <Typography color="#F6F6F6" fontSize="10px" sx={{ opacity: "0.5" }}>
-          1 {swapCurrency} = {Number(swapToUsdtRate).toFixed(3)} USDT
-        </Typography>
-        {address&&<Typography color="#F6F6F6" fontSize="10px" sx={{ opacity: "0.5" }}>
-          Wallet = {Number(swapBalance).toFixed(3)} {swapCurrency}
-        </Typography>
-      </Grid>
-    )} */}
   
           
   
@@ -260,7 +120,7 @@ return (
   <InputContainer container minHeight={'120px'} sx={{ marginTop: '2px', marginBottom:'20px'}}> 
     <Grid display={'flex'} justifyContent={'space-between'} width={'100%'}>
       <Typography color={'#F6F6F6'} fontSize={'16px'}>
-        For 
+        Remove USDC 
       </Typography>
 
       <Grid display={'flex'} alignItems={'center'}>
@@ -272,11 +132,11 @@ return (
     <Grid container alignItems={'center'} sx={{ flexWrap: 'nowrap' }}>
       <Input
         placeholder="0"
-        value={forAmount ? (Number(forAmount) * Number(conversionRate)).toFixed(5) : '0'}
-        // onChange={e => {
-        //   const formattedValue = validateAndFormatInput(e.target.value)
-        //   setDepositAmount(formattedValue)
-        // }}
+        value={usdcAmount}
+        onChange={e => {
+          const formattedValue = validateAndFormatInput(e.target.value)
+          setUsdcAmount(formattedValue)
+        }}
         onKeyDown={e => {
           if (e.key === 'e' || e.key === '-' || e.key === '+') {
             e.preventDefault()
@@ -292,95 +152,15 @@ return (
               WebkitTextFillColor: '#175b4d', // Ensures color override
             },
         }}
+        inputProps={{
+          style: { textAlign: "right" }, // Aligns text to the right
+        }}
       />
-      <FormControl variant="standard" sx={{ minWidth: '80px', color: 'white', fontSize: '12px' }}>
-        {!forCurrency && (
-          <InputLabel
-            id="demo-simple-select-standard-label"
-            sx={{ color: 'white', fontSize: '16px', mb:'5px' }}
-          >
-            Token
-          </InputLabel>
-        )}
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={forCurrency}
-          label="Select Token"
-          displayEmpty
-          renderValue={(selected) => (selected ? selected : '')}
-          onChange={handleForCurrencyChange}
-          
-          sx={{
-            m:0,
-            fontSize: '18px',
-            textAlign:'end',
-            color: 'white', // Text color inside the Select
-            '& .MuiSelect-select': {
-              fontSize: '18px', // Ensures selected option appears with 12px font size
-            },
-            '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'white', // Border color when not focused
-            },
-            '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'white', // Border color on hover
-            },
-            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'white', // Border color when focused
-            },
-          }}
-          MenuProps={{
-            PaperProps: {
-              sx: {
-                bgcolor: '#121212', // Dropdown background color
-                color: 'white', // Dropdown text color
-                fontSize: '16px',
-                borderColor:'transparent',
-                textAlign:'start'
-              },
-            },
-           }}
-        >
-          {currencyList.map((curr) => (
-            <MenuItem
-              key={curr.address}
-              value={curr.symbol}
-              sx={{
-                fontSize: '16px',
-                color: 'white', // Text color of MenuItem
-                '&.Mui-selected': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)', // Background of selected item
-                },
-                '&.Mui-selected:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.3)', // Background on hover when selected
-                },
-              }}
-            >
-              {curr.symbol}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
     </Grid>
 
-    {forCurrency && (
-      <Grid display="flex" justifyContent="space-between" width="100%">
-        <Typography color="#F6F6F6" fontSize="10px" sx={{ opacity: "0.5" }}>
-          {/* 1 {forCurrency} = {Number(forToUsdtRate).toFixed(3)} USDT */}
-        </Typography>
-        {address&&<Typography color="#F6F6F6" fontSize="10px" sx={{ opacity: "0.5" }}>
-          Wallet = {Number(forBalance).toFixed(3)} {forCurrency}
-        </Typography>}
-      </Grid>
-    )}
   
   </InputContainer>
 
-  {(fromCurrency && forCurrency) && (
-    <Typography margin="auto" fontSize="12px">
-      1 {fromCurrency} = {conversionRate} {forCurrency}
-    </Typography>
-  )}
   <RenderButton />
   
 </Grid>
