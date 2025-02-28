@@ -8,7 +8,7 @@ import WalletButtons from '@components/WalletButtons'
 import { useAccount, useWriteContract, useWalletClient, useChainId, usePublicClient } from 'wagmi'
 import {ConnectionType} from '../../connection/index'
 import { farmAbi } from '@components/StakingTabs/farmContract'
-import { erc20Abi, parseSignature } from 'viem'
+import { erc20Abi } from 'viem'
 import { useSwitchChain } from 'wagmi'
 import SwapVerticalCircleIcon from '@mui/icons-material/SwapVerticalCircle';
 import { CryptoInterface } from './analytics'

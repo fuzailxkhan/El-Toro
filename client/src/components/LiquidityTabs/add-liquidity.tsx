@@ -128,7 +128,7 @@ const AddLiquidity = () => {
                   // disabled={!depositAmount}
                   // disabled={true}
                 >
-                  Swap
+                  Add Liquidity
                 </Button>
               )
           }
