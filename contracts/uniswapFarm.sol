@@ -97,14 +97,15 @@ contract TestAddLiquidity {
 
         (uint256 amountA, uint256 amountB, uint256 liquidity) = 
             IUniswap(ROUTER).addLiquidity(
-            _tokenA, 
-            _tokenB, 
-            _amountA, 
-            _amountB, 
-            0, // Minimum liquidity
-            0, // Minimum liquidity
+            _tokenA, // Token A address
+            _tokenB, // Token B address
+            _amountA, // Desired amount A
+            _amountB, // Desired amount B
+            0, // Minimum amount of token A
+            0, // Minimum amount of token B
             msg.sender,
-            block.timestamp + 86400);
+            block.timestamp + 86400 // Tx deadline if exceed fail krdo
+            );
 
         return (amountA, amountB, liquidity);
     }
@@ -116,7 +117,6 @@ contract TestAddLiquidity {
     ) public returns(uint amountA, uint amountB) {
 
         address pair = IUniswapV2Factory(FACTORY).getPair(_tokenA, _tokenB);
-
 
         require(pair != address(0),"Pool not exist");
         uint liquidity = IERC20(pair).balanceOf(msg.sender);

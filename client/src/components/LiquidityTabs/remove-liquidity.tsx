@@ -83,7 +83,7 @@ return (
                 Remove ALPHA/BETA pair from Liquidity 
               </Typography>
             </Grid>
-  <InputContainer container minHeight={'120px'} sx={{marginBottom:'2px' ,marginTop:'2px'}}>
+  {/* <InputContainer container minHeight={'120px'} sx={{marginBottom:'2px' ,marginTop:'2px'}}>
     <Grid display={'flex'} justifyContent={'space-between'} width={'100%'} sx={{marginTop:'0px'}}>
       <Typography color={'#F6F6F6'} fontSize={'16px'}>
         Remove ALPHA 
@@ -127,22 +127,21 @@ return (
   
           
   
-  </InputContainer>
+  </InputContainer> */}
 
 
   {/* {console.log('active lockup option', activeLockupOption)} */}
-  <Grid sx={{display:'flex' , alignItems:'center', justifyContent:'center', width:'100%', position: 'relative'}}>
+  {/* <Grid sx={{display:'flex' , alignItems:'center', justifyContent:'center', width:'100%', position: 'relative'}}>
     <CurrencyExchangeIcon sx={{ position: 'absolute', top: '-15px' , fontSize:'28px'}}/>        
-  </Grid>
+  </Grid> */}
           
-  <InputContainer container minHeight={'120px'} sx={{ marginTop: '2px', marginBottom:'20px'}}> 
+  {/* <InputContainer container minHeight={'120px'} sx={{ marginTop: '2px', marginBottom:'20px'}}> 
     <Grid display={'flex'} justifyContent={'space-between'} width={'100%'}>
       <Typography color={'#F6F6F6'} fontSize={'16px'}>
         Remove BETA 
       </Typography>
 
       <Grid display={'flex'} alignItems={'center'}>
-        {/* <img src={VanarToken} height={'18px'} /> */}
         
       </Grid>
     </Grid>
@@ -177,7 +176,7 @@ return (
     </Grid>
 
   
-  </InputContainer>
+  </InputContainer> */}
 
   <RenderButton />
   

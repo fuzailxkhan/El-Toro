@@ -18,6 +18,7 @@ import { VanarToken } from '@assets/index'
 import Stake from '@components/StakingTabs/stake'
 import Reward from '@components/StakingTabs/reward'
 import Unstake from '@components/StakingTabs/unstake'
+import { useSwitchChain } from 'wagmi'
 
 const StakingTab = () => {
   const [depositAmt, setDepositAmt] = useState('')
@@ -26,6 +27,15 @@ const StakingTab = () => {
   const [balance, setBalance] = useState('0')
 
   const { provider, account, chainId } = useWeb3React()
+  const { chains, switchChain } = useSwitchChain();
+
+    useEffect(() => {
+      console.log('see here chain id', chainId)
+      if (chainId !== 17000) {
+        console.log('chain switch kro [][][]', chainId)
+        switchChain({ chainId: 17000 });
+      }
+    }, []);
 
   useEffect(() => {
     ;(async () => {

@@ -71,10 +71,10 @@ const AddLiquidity = () => {
   const addLiquidity = async () => {
 
     const alphaToken = "0xfAC5236D60Ba219268d1ef73720a94DB34dee72b";
-    const betaToken = "0xd34c3b5F65dD10668a4EeaeD447567Eb797bB94d"
+    const betaToken = "0xd34c3b5F65dD10668a4EeaeD447567Eb797bB94d";
    
-    console.log('adding liqduity')
-    const amount = ethers.utils.parseEther(fromAmount);
+    console.log('adding liqduity', toroAmount)
+    const amount = ethers.utils.parseEther(toroAmount);
 
     // @ts-ignore //
     await writeContract({
@@ -84,29 +84,12 @@ const AddLiquidity = () => {
       args: [alphaToken, betaToken, amount, amount],
     })
   }
-
-    const [fromCurrency,setFromCurrency] = useState('')
-    const [fromAmount,setFromAmount] = useState('')
-
-    const [forCurrency, setForCurrency] = useState('')
-    const [forAmount,setForAmount] = useState('')
-
-    const [conversionRate,setConversionRate] = useState('')
     
     const [toroAmount,setToroAmount] = useState('')
 
-    const [usdcAmount,setUsdcAmount] = useState('')
-
-    // const [conversionRate,setConversionRate] = useState('')
-    
-    // const [toroBalance,setToroBalance] = useState('')
-    // const [usdcBalance,setUsdcBalance] = useState('')
-
     const { address, isConnected } = useAccount();
 
-        const onLiquidate = () =>{
-            console.log("Liquidate")
-        }
+
 
 
         const RenderButton = () => { 

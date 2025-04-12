@@ -6,10 +6,12 @@ import WalletButtons from "@components/WalletButtons";
 import { ConnectionType } from "../../connection";
 import {
   useAccount,
+  useReadContract,
   useWriteContract,
 } from "wagmi";
 import { farmingAbi, farmingContractAddress } from "./contract";
 import { InputContainer } from '@pages/Home/styles'
+import { ethers } from "ethers";
 
 const Reward = () => {
   const { address, isConnecting, isDisconnected, isConnected } = useAccount();
@@ -17,7 +19,7 @@ const Reward = () => {
   const { writeContract } = useWriteContract();
 
   const onRewardClaim = () => {
-    /* @ts-ignore */
+    /* @ts-ignore */ 
     const contractRes = writeContract({
       abi: farmingAbi,
       address: farmingContractAddress,

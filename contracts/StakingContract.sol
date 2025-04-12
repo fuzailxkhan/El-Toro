@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 import "./IERC20.sol";
 
-contract StakingContract {
+contract StakingContract { 
     uint256 public totalStaked;
     address public owner;
     bool public isPaused = false;
